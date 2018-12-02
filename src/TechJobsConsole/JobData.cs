@@ -13,7 +13,7 @@ namespace TechJobsConsole
         public static List<Dictionary<string, string>> FindAll()
         {
             LoadData();
-            return AllJobs;
+            return DeepCopyAllJobs(AllJobs);
         }
 
         /*
@@ -35,6 +35,8 @@ namespace TechJobsConsole
                     values.Add(aValue);
                 }
             }
+
+            values.Sort();
             return values;
         }
 
@@ -49,9 +51,34 @@ namespace TechJobsConsole
             {
                 string aValue = row[column];
 
-                if (aValue.Contains(value))
+                if (StringNoCaseContains(aValue, value))
                 {
-                    jobs.Add(row);
+                    jobs.Add(DeepCopyJob(row));
+                }
+            }
+
+            return jobs;
+        }
+
+        public static List<Dictionary<string, string>> FindByValue(string value)
+        {
+            // load data, if not already loaded
+            LoadData();
+
+            List<Dictionary<string, string>> jobs = new List<Dictionary<string, string>>();
+
+            foreach (Dictionary<string, string> row in AllJobs) // for each job
+            {
+                foreach (KeyValuePair<string, string> kvp in row) // for field in a job
+                {                                     
+                    if (StringNoCaseContains(kvp.Value, value)) // ignore case
+                    {
+                        jobs.Add(DeepCopyJob(row));
+
+                        // this field is a match, no need to check the other fields.  Break out and inspect next job.
+                        break; 
+                    }
+
                 }
             }
 
@@ -137,6 +164,32 @@ namespace TechJobsConsole
             valueBuilder.Clear();
 
             return rowValues.ToArray();
+        }
+
+        // Performs case sensitive check whether the value string contains the search string.
+        private static bool StringNoCaseContains(string value, string search)
+        {
+            return ((value.ToUpper()).Contains(search.ToUpper()));
+        }
+
+        private static Dictionary<string, string> DeepCopyJob(Dictionary<string, string> copyMe)
+        {
+            Dictionary<string, string> copiedJob = new Dictionary<string, string>();
+            foreach (KeyValuePair<string, string> kvp in copyMe)
+            {
+                copiedJob.Add(kvp.Key, kvp.Value);
+            }
+            return copiedJob;
+        }
+
+        private static List<Dictionary<string,string>> DeepCopyAllJobs(List<Dictionary<string,string>> copyMe)
+        {
+            List<Dictionary<string, string>> copiedList = new List<Dictionary<string, string>>();
+            foreach (Dictionary<string, string> job in copyMe)
+            {
+                copiedList.Add(DeepCopyJob(job));
+            }
+            return copiedList;
         }
     }
 }

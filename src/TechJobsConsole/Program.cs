@@ -63,7 +63,8 @@ namespace TechJobsConsole
                     // Fetch results
                     if (columnChoice.Equals("all"))
                     {
-                        Console.WriteLine("Search all fields not yet implemented.");
+                        searchResults = JobData.FindByValue(searchTerm);
+                        PrintJobs(searchResults);
                     }
                     else
                     {
@@ -122,19 +123,17 @@ namespace TechJobsConsole
             {
                 foreach (Dictionary<string, string> job in someJobs)
                 {
-                    Console.WriteLine("*****");
+                    Console.WriteLine("\n*****"); // insert an new line before the ***** line.
                     foreach (KeyValuePair<string, string> kvp in job)
                     {
                         Console.WriteLine(String.Format("{0}: {1}", kvp.Key, kvp.Value));
                     }
-
+                    Console.WriteLine("*****"); // insert an extra space ('\n') after the entry.
                 }
-                Console.WriteLine("*****");
-
             }
             else
             {
-                Console.WriteLine("No Jobs to print.\n");
+                Console.WriteLine("No results\n");
             }
 
         }
